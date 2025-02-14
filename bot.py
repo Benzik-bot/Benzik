@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Ініціалізація бота
 bot = Bot(token=TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
 # Кнопки для головного меню
 main_menu = ReplyKeyboardMarkup(resize_keyboard=True)
