@@ -2,7 +2,7 @@ import logging
 import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from asyncio
+import asyncio
 from dotenv import load_dotenv
 
 # Завантаження змінних середовища
