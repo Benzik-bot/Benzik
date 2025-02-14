@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Ініціалізація бота
 bot = Bot(token=TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(bot)
 
 # Кнопки для головного меню
 main_menu = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -51,44 +51,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
