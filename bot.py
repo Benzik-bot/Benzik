@@ -89,8 +89,8 @@ async def help_info(message: types.Message):
 # Запуск бота
 async def main():
     try:
-        await bot.delete_webhook(drop_pending_updates=True)
-        await dp.start_polling(bot)
+        await bot.delete_webhook(drop_pending_updates=True)  # Видаляємо попередні вебхуки
+        await dp.start_polling(bot)  # Запускаємо бота через polling
     except Exception as e:
         logging.error(f"Помилка запуску бота: {e}")
 
