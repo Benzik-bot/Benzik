@@ -4,7 +4,7 @@ import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
-from aiogram.enums import ContentType
+from aiogram.enums import ContentType, ParseMode
 from aiogram.utils.markdown import hbold
 from dotenv import load_dotenv
 
@@ -16,7 +16,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 logging.basicConfig(level=logging.INFO)
 
 # Ініціалізація бота та диспетчера
-bot = Bot(token=TOKEN, parse_mode="HTML")
+bot = Bot(token=TOKEN, default=ParseMode.HTML)
 dp = Dispatcher()
 
 # Головне меню
@@ -51,7 +51,7 @@ async def start_command(message: types.Message):
     )
 
 # Обробка номера телефону
-@dp.message(F.contact)
+@dp.message(F.content_type == ContentType.CONTACT)
 async def phone_handler(message: types.Message):
     user_phone = message.contact.phone_number
     await message.answer("Дякую! Тепер ти можеш використовувати всі функції бота.", reply_markup=get_main_menu())
