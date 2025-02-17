@@ -1,7 +1,7 @@
 import logging
 import os
 import asyncio
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.filters import Command
 from aiogram.enums import ContentType
@@ -19,10 +19,25 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN, parse_mode="HTML")
 dp = Dispatcher()
 
-# Кнопки для головного меню
-main_menu = ReplyKeyboardMarkup(resize_keyboard=True)
-main_menu.row(KeyboardButton("🔋 Заправитись"), KeyboardButton("📋 Мої заявки"))
-main_menu.row(KeyboardButton("💰 Актуальна ціна"), KeyboardButton("ℹ️ Допомога"))
+# Головне меню
+def get_main_menu():
+    menu = ReplyKeyboardMarkup(resize_keyboard=True)
+    menu.row(KeyboardButton("🔋 Заправитись"), KeyboardButton("📋 Мої заявки"))
+    menu.row(KeyboardButton("💰 Актуальна ціна"), KeyboardButton("ℹ️ Допомога"))
+    return menu
+
+# Меню АЗС
+def get_fuel_menu():
+    menu = ReplyKeyboardMarkup(resize_keyboard=True)
+    menu.row(KeyboardButton("АЗС №1"), KeyboardButton("АЗС №2"), KeyboardButton("АЗС №3"))
+    return menu
+
+# Меню вибору літражу
+def get_liters_menu():
+    menu = ReplyKeyboardMarkup(resize_keyboard=True)
+    menu.row(KeyboardButton("10 л"), KeyboardButton("20 л"), KeyboardButton("50 л"))
+    menu.row(KeyboardButton("🔙 Назад"))
+    return menu
 
 # Авторизація користувача
 @dp.message(Command("start"))
@@ -35,20 +50,41 @@ async def start_command(message: types.Message):
         reply_markup=keyboard
     )
 
-@dp.message(lambda message: message.contact, ContentType.CONTACT)
+# Обробка номера телефону
+@dp.message(F.contact)
 async def phone_handler(message: types.Message):
     user_phone = message.contact.phone_number
-    user_id = message.from_user.id
-    # Тут можна перевіряти номер в базі даних
-    await message.answer(f"Дякую! Тепер ти можеш використовувати всі функції бота.", reply_markup=main_menu)
+    await message.answer("Дякую! Тепер ти можеш використовувати всі функції бота.", reply_markup=get_main_menu())
 
 # Обробка кнопки "Заправитись"
-@dp.message(lambda message: message.text == "🔋 Заправитись")
+@dp.message(F.text == "🔋 Заправитись")
 async def request_fuel(message: types.Message):
-    fuel_menu = ReplyKeyboardMarkup(resize_keyboard=True).row(
-        KeyboardButton("АЗС №1"), KeyboardButton("АЗС №2"), KeyboardButton("АЗС №3")
-    )
-    await message.answer("Вибери свою заправку:", reply_markup=fuel_menu)
+    await message.answer("Вибери свою заправку:", reply_markup=get_fuel_menu())
+
+# Вибір літражу після АЗС
+@dp.message(F.text.in_(["АЗС №1", "АЗС №2", "АЗС №3"]))
+async def select_liters(message: types.Message):
+    await message.answer("Вибери кількість літрів:", reply_markup=get_liters_menu())
+
+# Підтвердження замовлення
+@dp.message(F.text.in_(["10 л", "20 л", "50 л"]))
+async def confirm_order(message: types.Message):
+    await message.answer(f"✅ Твоя заявка на {message.text} пального прийнята!", reply_markup=get_main_menu())
+
+# Обробка кнопки "Мої заявки"
+@dp.message(F.text == "📋 Мої заявки")
+async def my_orders(message: types.Message):
+    await message.answer("У тебе поки немає активних заявок.")
+
+# Обробка кнопки "Актуальна ціна"
+@dp.message(F.text == "💰 Актуальна ціна")
+async def fuel_price(message: types.Message):
+    await message.answer("Сьогодні ціна пального: 45 грн/л")
+
+# Обробка кнопки "Допомога"
+@dp.message(F.text == "ℹ️ Допомога")
+async def help_info(message: types.Message):
+    await message.answer("Я допоможу тобі заправити авто! Обери 'Заправитись' та слідуй інструкціям.")
 
 # Запуск бота
 async def main():
